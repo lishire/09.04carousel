@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .btn_list{
+            z-index: 999;
+            position: relative;
+            top: -100px;
+        }
+        .btn_list span{
+            display:block;
+            float:left;
+            width:15px;
+            height:15px;
+            border-radius:50%;
+            background-color: white;
+            margin-left: 15px;
+
+        }
+        .btn_list .on{
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+<div class="carousel" data-carousel='{"src":["img/01.jpg","img/02.jpg","img/03.jpg"],"config":{"width":500,"height":400}}'></div>
+</body>
+<script>
+    window.onload=function() {
+        var content = document.getElementsByClassName("carousel")[0];
+        var config = content.getAttribute("data-carousel");
+        var a = JSON.parse(config);
+        var imgSrc = a.src;   //["img1.jpg","img2.jpg","img3.jgp"]
+        var box = a.config;   //["width":500,"height":400]
+        var idx;
+//      生成最大div
+        if (box.width != null || box.width != undefined) {
+            content.style.width = box.width + "px";
+        } else {
+            content.style.width = 500 + "px";
+        }
+        if (box.height != null || box.height != undefined) {
+            content.style.height = box.height + "px";
+        } else {
+            content.style().height = 500 + "px";
+        }
+        var con_width = parseInt(content.style.width);
+        var con_height = parseInt(content.style.height);
+        content.style.overflow = "hidden";
+
+//        放置图片的div
+        var list = document.createElement("div");
+        list.style.width = con_width * imgSrc.length + "px";
+        list.style.height = con_height + "px";
+        list.style.position = "relative";
+        list.style.left = 0;
+        list.style.transition = "all .5s ease-in-out";
+        content.appendChild(list);
+        var new_left = parseInt(list.style.left);
+        for (var i = 0; i < imgSrc.length; i++) {
+            list.appendChild(document.createElement("img"));
+        }
+        var img = document.getElementsByTagName("img");
+
+        for (var n = 0; n < img.length; n++) {
+            for (var k = 0; k < img.length; k++) {
+                if (n === k) {
+                    img[k].src = imgSrc[k]
+                }
+            }
+        }
+
+//        生成箭头div
+        var arrow = document.createElement("div");
+        arrow.style.width = con_width + "px";
+        arrow.style.height = 50 + "px";
+        arrow.style.position = "relative";
+        arrow.style.top = -(con_height /2+ 50) + "px";
+        content.appendChild(arrow);
+
+//        箭头样式
+        var left = document.createElement("span");
+        var right = document.createElement("span");
+        left.innerHTML = "<";
+        right.innerHTML = ">";
+        left.style.fontSize = "50px";
+        right.style.fontSize = "50px";
+        left.style.float = "left";
+        right.style.float="right";
+        arrow.appendChild(left);
+        arrow.appendChild(right);
+
+
+        function moving(speed, terminal, flag) {
+            if (new_left === terminal) {
+                new_left = flag;
+            }
+            else {
+                new_left += speed;
+            }
+            list.style.left = new_left + "px";
+
+            for (var i = 0; i < btn.length; i++) {
+                btn[i].setAttribute("class", "");
+            }
+            btn[Math.abs(new_left / con_width)].setAttribute("class", "on")
+        }
+
+        right.addEventListener("click", function () {
+            moving(-con_width, -con_width * (imgSrc.length - 1), 0);
+        });
+        left.addEventListener("click", function () {
+            moving(con_width, 0, -con_width * (imgSrc.length - 1));
+        });
+
+//        创建名为btn_list的div
+        var btn_list = document.createElement("div");
+        btn_list.className = "btn_list";
+        btn_list.style.left = (con_width) / 2 - 100 + "px";
+
+        for (var a = 0; a < imgSrc.length; a++) {
+//            创建span标签放在btn_list里边
+            btn_list.appendChild(document.createElement("span"));
+        }
+//        把btn_list放在content里边
+        content.appendChild(btn_list);
+
+        var btn = document.getElementsByClassName("btn_list")[0].getElementsByTagName("span");
+//        button按钮索引第一个class为on
+        btn[0].className = "on";
+
+        for (var m = 0; m < btn.length; m++) {
+
+//            (function(s){
+//                btn_list[s].onclick=function(){
+//                    btn_control(this,s);
+//                }
+//            })(m);
+//        }
+//        for(var r=0;r<btn.length;r++){
+//
+//        }
+//        function btn_control(that,num){
+////            清空样式
+
+            (function(s){
+                btn[s].addEventListener("click",function(){
+                    new_left = s*(-con_width);
+                    list.style.left=new_left+"px";
+
+                    for(var i=0;i<btn.length;i++){
+                        btn[i].setAttribute("class","");
+                    }
+                    btn[s].setAttribute("class","on");
+                    idx=s;
+                })
+            })(m);
+        }
+
+        content.timer = setInterval(function () {
+            moving(-con_width,-con_width*(imgSrc.length-1),0)
+        },1500);
+        content.onmouseover = function () {
+            clearInterval(content.timer);
+        };
+        content.onmouseout = function () {
+            clearInterval(content.timer);
+            content.timer = setInterval(function () {
+                moving(-con_width,-con_width*(imgSrc.length-1),0)
+            }, 1500);
+        };
+
+
+        }
+
+</script>
+</html>
